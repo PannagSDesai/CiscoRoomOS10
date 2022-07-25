@@ -11,15 +11,15 @@ import jxmlease
 import time
 import typing
 from datetime import datetime, timezone
+from functools import wraps
 
 class Cisco_RoomOS:
     """
-    This example module shows various types of documentation available for use
-    with pydoc.  To generate HTML documentation for this module issue the
-    command:
+    This is Cisco Room OS 10 SDK which adds abstraction to the xAPI allowing devlopers-administrators to use most xAPI functions with Python
+    without having to worry about parsing the results.
     
-        pydoc -w foo
-    
+    Usage: import the library , create an object with parameters in order: IP address, username and password.
+    Use this object to access functions as per the requirement.
     """
     __PACUrl_flag=0
     __man_flag=0
@@ -129,6 +129,7 @@ class Cisco_RoomOS:
         
     def _get_status_helper(func):
         """Helper function to process requests and its response output for all status functions"""
+        @wraps(func)
         def inner(self,*n):
             url = func(self,*n)
             headers = {
