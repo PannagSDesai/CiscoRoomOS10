@@ -13,7 +13,7 @@ setup(
    license="MIT",
    description='A library written for python to provide abstraction for Cisco xAPI which is used in administration of Video Conferencing devices running RoomOS10',
    author='Pannag Desai',
-   url="https://github.com/PannagSDesai/RomanLibrary.git",
+   url="https://github.com/PannagSDesai/CiscoRoomOS10",
    download_url="https://github.com/PannagSDesai/EasyRoman/archive/refs/tags/Numbers.tar.gz",
    keywords=["Number system conversion"],
    long_description="This library provides most functions applicable for all models",
