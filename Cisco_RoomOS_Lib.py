@@ -49,14 +49,15 @@ class Cisco_RoomOS:
             elif (response.status_code==400):
                 raise Exception("Connection Failed , Please check Connection\n")
             elif (response.status_code==200):
-                response_data = self.__return_type_parser(response,return_type = "json")
+                #response_data = self.__return_type_parser(response,return_type = "json")
+                response_data = jxmlease.parse(response.text)
                 Name = response_data['Status']['UserInterface']['ContactInfo']['Name']
                 return response_data
             else:
                 raise Exception("Unknown Exception\n") 
            
         except Exception as e:
-            print(e)
+            return(e)
         
     
     def get_device_backup(self):
@@ -136,7 +137,7 @@ class Cisco_RoomOS:
               'Content-Type': 'text/xml',
             }
             try:
-                response_connect = requests.request("GET", url, headers=headers,auth=HTTPBasicAuth(username=self.username,password=self.password))
+                response_connect = requests.request("GET", url, headers=headers,auth=HTTPBasicAuth(username=self.username,password=self.password),verify=self.ssl_verify)
                 if (response_connect.status_code==401):
                         raise Exception("Authorisation Failed , Please check Credentials\n")
                 elif (response_connect.status_code==400):
@@ -1845,7 +1846,7 @@ class Cisco_RoomOS:
         }
         payload_Bookings_protocol_priotity = f"<Configuration>\r\n\t\t<Bookings>\r\n\t\t<ProtocolPriority>{protocol}</ProtocolPriority>\r\n\t\t</Bookings>\r\n</Configuration>"
         try:
-            response = requests.post(url, headers=headers,auth=HTTPBasicAuth(self.username,self.password), data=payload_Bookings_protocol_priotity)
+            response = requests.post(url, headers=headers,auth=HTTPBasicAuth(self.username,self.password), data=payload_Bookings_protocol_priotity,verify=self.ssl_verify)
             call_priotity = jxmlease.parse(response.text)
             if response.status_code == 200:
                 if "Success" in response.text:
@@ -2254,7 +2255,7 @@ class Cisco_RoomOS:
         estimations.
         Usage:  (Default 10)-60 ,Requires user role: ADMIN, INTEGRATOR, USER"""
         
-        payload = f"<Configuration>\r\n\t<RoomAnalytics>\r\n\t\t<AmbientNoiseEstimation>\r\n\t\t\t<Interval>{interval}</Interval>\r\n\t</AmbientNoiseEstimation>\r\n\t</RoomAnalytics>\r\n</Configuration>"
+        payload = f"<Configuration>\r\n\t<RoomAnalytics>\r\n\t\t<AmbientNoiseEstimation>\r\n\t\t\t<Interval>{int(interval)}</Interval>\r\n\t</AmbientNoiseEstimation>\r\n\t</RoomAnalytics>\r\n</Configuration>"
         return (self.__post_parser_return(payload,output_debug))
     
     def set_ambient_noise_estimation_mode(self,mode:str,output_debug:bool=False):
@@ -2294,7 +2295,7 @@ class Cisco_RoomOS:
         The RoomAnalytics ReverberationTime Mode configuration must be enabled to set the interval.
         Usage: Supply interval value (60-3600), default = 1800, Requires user role: ADMIN, INTEGRATOR, USER"""
         
-        payload = f"<Configuration>\r\n\t<RoomAnalytics>\r\n\t\t<ReverberationTime>\r\n\t\t\t<Interval>{interval}</Interval>\r\n\t</ReverberationTime>\r\n\t</RoomAnalytics>\r\n</Configuration>"
+        payload = f"<Configuration>\r\n\t<RoomAnalytics>\r\n\t\t<ReverberationTime>\r\n\t\t\t<Interval>{int(interval)}</Interval>\r\n\t</ReverberationTime>\r\n\t</RoomAnalytics>\r\n</Configuration>"
         return (self.__post_parser_return(payload,output_debug))
     
     def set_reverberation_time_mode(self,mode:str,output_debug:bool=False):
@@ -2555,7 +2556,7 @@ class Cisco_RoomOS:
         Requires the Standby Control to be enabled.
         Usage: Integer (1..480), Requires user role: ADMIN, INTEGRATOR"""
         
-        payload = f"<Configuration>\r\n\t<Standby>\r\n\t\t<Delay>{delay}</Delay>\r\n\t\t</Standby>\r\n</Configuration>"
+        payload = f"<Configuration>\r\n\t<Standby>\r\n\t\t<Delay>{int(delay)}</Delay>\r\n\t\t</Standby>\r\n</Configuration>"
         return (self.__post_parser_return(payload,output_debug))
     
     
@@ -2586,7 +2587,7 @@ class Cisco_RoomOS:
         interval with the interactive mode.
         Usage: Integer (0..1440), Requires user role: ADMIN, INTEGRATOR"""
         
-        payload = f"<Configuration>\r\n\t<Standby>\r\n\t\t<Signage>\r\n\t\t\t<RefreshInterval>{interval}</RefreshInterval>\r\n\t\t</Signage>\r\n\t\t</Standby>\r\n</Configuration>"
+        payload = f"<Configuration>\r\n\t<Standby>\r\n\t\t<Signage>\r\n\t\t\t<RefreshInterval>{int(interval)}</RefreshInterval>\r\n\t\t</Signage>\r\n\t\t</Standby>\r\n</Configuration>"
         return (self.__post_parser_return(payload,output_debug))
     
     def set_standby_wakeup_action(self,camera_pos:str,output_debug:bool=False):
@@ -2755,7 +2756,7 @@ class Cisco_RoomOS:
         payload = f"<Configuration>\r\n\t<UserInterface>\r\n\t\t<Features>\r\n\t\t<HideAll>{mode}</HideAll>\r\n\t\t</Features>\r\n\t\t</UserInterface>\r\n</Configuration>"
         return (self.__post_parser_return(payload,output_debug))
     
-    def set_ui_features_sahre_start(self,mode:str="Auto",output_debug:bool=False):
+    def set_ui_features_share_start(self,mode:str="Auto",output_debug:bool=False):
         """Description: Choose whether or not to remove the default buttons and other UI elements for sharing and 
         previewing content, both in call and out of call, from the user interface. The setting removes 
         only the buttons and UI elements, not their functionality as such. You can still share content 
@@ -3225,7 +3226,7 @@ class Cisco_RoomOS:
             headers = {
               'Content-Type': 'text/xml',
             }
-            response = requests.post(url, headers=headers,auth=HTTPBasicAuth(self.username,self.password), data=payload)
+            response = requests.post(url, headers=headers,auth=HTTPBasicAuth(self.username,self.password), data=payload,verify= self.ssl_verify)
             response_json = jxmlease.parse(response.text)
             if response.status_code == 200:
                 if "OK" in response.text:
@@ -3249,7 +3250,7 @@ class Cisco_RoomOS:
             headers = {
               'Content-Type': 'text/xml',
             }
-            response = requests.post(url, headers=headers,auth=HTTPBasicAuth(self.username,self.password), data=payload)
+            response = requests.post(url, headers=headers,auth=HTTPBasicAuth(self.username,self.password), data=payload, verify=self.ssl_verify)
             response_json = jxmlease.parse(response.text)
             if response.status_code == 200:
                 if "Success" in response.text:
